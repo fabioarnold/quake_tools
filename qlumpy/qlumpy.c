@@ -41,11 +41,11 @@ typedef struct
 
 command_t       commands[] =
 {
-	{"palette",GrabPalette},
-	{"colormap",GrabColormap},
-	{"qpic",GrabPic},
-	{"miptex",GrabMip},
-	{"raw",GrabRaw},
+	{"palette",GrabPalette}, // @
+	{"colormap",GrabColormap}, // A
+	{"qpic",GrabPic}, // B
+	{"raw",GrabRaw}, // C
+	{"miptex",GrabMip}, // D
 
 	{"colormap2",GrabColormap2},
 
@@ -72,6 +72,23 @@ void LoadScreen (char *name)
 	byteimageheight = bmhd.h;
 }
 
+/*
+==============
+LoadScreenBMP
+==============
+*/
+
+void LoadScreenBMP (char *name)
+{
+	char	*expanded;
+
+	expanded = ExpandPathAndArchive (name);
+
+	printf ("grabbing from %s...\n",expanded);
+	LoadBMP (expanded, &byteimage, &lbmpalette, &byteimagewidth, &byteimageheight);
+}
+
+
 
 /*
 ================
@@ -95,7 +112,7 @@ WriteLump
 void WriteLump (int type, int compression)
 {
 	int		size;
-	
+
 	if (!outputcreated)
 		CreateOutput ();
 
@@ -130,7 +147,7 @@ void WriteFile (void)
 	sprintf (filename,"%s/%s.lmp", destfile, lumpname);
 	exp = ExpandPath(filename);
 	printf ("saved %s\n", exp);
-	SaveFile (exp, lumpbuffer, lump_p-lumpbuffer);		
+	SaveFile (exp, lumpbuffer, lump_p-lumpbuffer);
 }
 
 /*
@@ -142,7 +159,7 @@ void ParseScript (void)
 {
 	int			cmd;
 	int			size;
-	
+
 	do
 	{
 		//
@@ -155,6 +172,13 @@ void ParseScript (void)
 		{
 			GetToken (false);
 			LoadScreen (token);
+			continue;
+		}
+
+		if (!Q_strcasecmp (token, "$LOADBMP"))
+		{
+			GetToken (false);
+			LoadScreenBMP (token);
 			continue;
 		}
 
@@ -179,7 +203,7 @@ void ParseScript (void)
 		//
 		if (strlen(token) >= sizeof(lumpname) )
 			Error ("\"%s\" is too long to be a lump name",token);
-		memset (lumpname,0,sizeof(lumpname));			
+		memset (lumpname,0,sizeof(lumpname));
 		strcpy (lumpname, token);
 		for (size=0 ; size<sizeof(lumpname) ; size++)
 			lumpname[size] = tolower(lumpname[size]);
@@ -204,14 +228,14 @@ void ParseScript (void)
 
 		if ( !commands[cmd].name )
 			Error ("Unrecognized token '%s' at line %i",token,scriptline);
-	
+
 		grabbed++;
-		
+
 		if (savesingle)
 			WriteFile ();
-		else	
+		else
 			WriteLump (TYP_LUMPY+cmd, 0);
-		
+
 	} while (script_p < scriptend_p);
 }
 
@@ -227,7 +251,7 @@ void ProcessLumpyScript (char *basename)
 	char            script[256];
 
 	printf ("qlumpy script: %s\n",basename);
-	
+
 //
 // create default destination directory
 //
@@ -241,19 +265,19 @@ void ProcessLumpyScript (char *basename)
 	savesingle = false;
 	grabbed = 0;
 	outputcreated = false;
-	
-	
+
+
 //
 // read in the script file
 //
 	strcpy (script, basename);
 	DefaultExtension (script, ".ls");
 	LoadScriptFile (script);
-	
+
 	strcpy (basepath, basename);
-	
+
 	ParseScript ();				// execute load / grab commands
-	
+
 	if (!savesingle)
 	{
 		WriteWad ();				// write out the wad directory
@@ -272,7 +296,7 @@ main
 int main (int argc, char **argv)
 {
 	int		i;
-	
+
 	printf ("\nqlumpy "VERSION" by John Carmack, copyright (c) 1994 Id Software\n");
 
 	if (argc == 1)
@@ -296,6 +320,6 @@ int main (int argc, char **argv)
 		SetQdirFromPath (argv[i]);
 		ProcessLumpyScript (argv[i]);
 	}
-		
+
 	return 0;
 }
