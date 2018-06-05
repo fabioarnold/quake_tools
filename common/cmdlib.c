@@ -3,6 +3,7 @@
 #include "cmdlib.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -99,7 +100,7 @@ void SetQdirFromPath (char *path)
 char *ExpandPath (char *path)
 {
 	static char full[1024];
-	if (!qdir)
+	if (!qdir[0])
 		Error ("ExpandPath called without qdir set");
 	if (path[0] == '/' || path[0] == '\\' || path[1] == ':')
 		return path;

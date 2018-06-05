@@ -276,7 +276,7 @@ void	AddLump (char *name, void *buffer, int length, int type, int compress)
 	info = &outinfo[outlumps];
 	outlumps++;
 
-	memset (info,0,sizeof(info));
+	memset (info,0,sizeof(*info));
 	
 	strcpy (info->name, name);
 	strupr (info->name);
