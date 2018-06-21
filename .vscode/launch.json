@@ -10,7 +10,7 @@
 			"request": "launch",
 			"program": "${workspaceRoot}/bin/qbsp",
 			"cwd": "${workspaceRoot}/bin",
-			"args": ["../testfiles/START.MAP"],
+			"args": ["../testfiles/room.map"],
 			"MIMode": "gdb",
 			"osx": {
 				"MIMode": "lldb"

@@ -212,13 +212,16 @@ void ClipInside (int splitplane, int frontside, qboolean precedence)
 			SplitFace (f, split, &frags[0], &frags[1]);
 		}
 		
+		Draw_ClearWindow();
 		if (frags[frontside])
 		{
+			Draw_DrawFace(frags[frontside]);
 			frags[frontside]->next = outside;
 			outside = frags[frontside];
 		}
 		if (frags[!frontside])
 		{
+			Draw_DrawFace(frags[!frontside]);
 			frags[!frontside]->next = insidelist;
 			insidelist = frags[!frontside];
 		}
@@ -240,7 +243,8 @@ void SaveOutside (qboolean mirror)
 	face_t	*f , *next, *newf;
 	int		i;
 	int		planenum;
-		
+	
+	Draw_ClearWindow();
 	for (f=outside ; f ; f=next)
 	{
 		next = f->next;
